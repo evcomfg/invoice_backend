@@ -4,22 +4,24 @@ const bodyParser = require("body-parser");
 const PDFDocument = require("pdfkit");
 const path = require("path");
 
-
 const corsOptions = {
     origin: '*', // Allow all origins
     methods: 'GET,POST',
     allowedHeaders: 'Content-Type',
-  };
+};
 
 const app = express();
 app.use(cors(corsOptions)); // Enable CORS
 app.use(bodyParser.json());
 
-const TAX_RATE = 5; // 5%
+const TAX_RATE = 7.25; // 7.25%
 
 // POST endpoint to generate the invoice
 app.post("/api/invoice", (req, res) => {
-    const { customerName, address1, unit, city, state, zipCode, cartModel, basePrice, battery, battery_price, addOns } = req.body;
+    const {
+        customerName, address1, unit, city, state, zipCode, cartModel, basePrice,
+        battery, battery_price, paint, paintColor, paintPrice, addOns
+    } = req.body;
 
     if (!customerName || !address1 || !city || !state || !zipCode || !cartModel || !basePrice) {
         console.error("Missing required fields.");
@@ -29,7 +31,7 @@ app.post("/api/invoice", (req, res) => {
     // Calculate prices
     const batteryPrice = battery === "AMG batteries 150A-48 V (Standard)" ? 0 : battery_price;
     const addOnsTotal = addOns ? addOns.reduce((sum, addOn) => sum + (addOn.price || 0), 0) : 0;
-    const subtotal = basePrice + batteryPrice + addOnsTotal;
+    const subtotal = basePrice + batteryPrice + addOnsTotal + paintPrice;
     const taxAmount = subtotal * (TAX_RATE / 100);
     const totalPrice = subtotal + taxAmount;
 
@@ -55,7 +57,7 @@ app.post("/api/invoice", (req, res) => {
         .text("EVCO Manufacturing", 400, 60, { align: "right" })
         .text("405 N Grandview St", 400, 75, { align: "right" })
         .text("Union City, OH, 45390", 400, 90, { align: "right" })
-        .text("Phone: [Your Phone Number]", 200, 105, { align: "right" })
+        .text("Phone: [Your Phone Number]", 400, 105, { align: "right" })
         .moveDown();
 
     // Add invoice details
@@ -94,22 +96,32 @@ app.post("/api/invoice", (req, res) => {
         .text(`$${batteryPrice.toFixed(2)}`, 305, 315, { width: 100, align: "center" })
         .text(`$${batteryPrice.toFixed(2)}`, 405, 315, { width: 95, align: "center" });
 
-    // Start adding add-ons below the base item
-    let positionY = 335;
-    addOns.forEach((addOn, index) => {
+    // Add the paint type and color
+    if (paint) {
         pdfDoc
-            .text(addOn.name, 55, positionY + index * 20, { width: 250, align: "left" })
-            .text(`$${addOn.price.toFixed(2)}`, 305, positionY + index * 20, { width: 100, align: "center" })
-            .text(`$${addOn.price.toFixed(2)}`, 405, positionY + index * 20, { width: 95, align: "center" });
-    });
+            .text(paint + (paintColor ? ` - ${paintColor}` : ''), 55, 335, { width: 250, align: "left" })
+            .text(`$${paintPrice.toFixed(2)}`, 305, 335, { width: 100, align: "center" })
+            .text(`$${paintPrice.toFixed(2)}`, 405, 335, { width: 95, align: "center" });
+    }
 
-    // Move down to the subtotal, tax, and total section
-    positionY += addOns.length * 20 + 20;
+    // Start adding add-ons below the base item
+    let positionY = 355;
+    if (addOns) {
+        addOns.forEach((addOn, index) => {
+            pdfDoc
+                .text(addOn.name, 55, positionY + index * 20, { width: 250, align: "left" })
+                .text(`$${addOn.price.toFixed(2)}`, 305, positionY + index * 20, { width: 100, align: "center" })
+                .text(`$${addOn.price.toFixed(2)}`, 405, positionY + index * 20, { width: 95, align: "center" });
+        });
+
+        // Move down to the subtotal, tax, and total section
+        positionY += addOns.length * 20 + 20;
+    }
 
     pdfDoc
         .fontSize(12)
         .text("Subtotal:", 305, positionY, { align: "center" })
-        .text(`$${subtotal.toFixed(2)}`, 405, positionY, { align: "right" });
+        .text(`$${(basePrice + batteryPrice + addOnsTotal + paintPrice).toFixed(2)}`, 405, positionY, { align: "right" });
 
     pdfDoc
         .fontSize(12)
@@ -117,11 +129,11 @@ app.post("/api/invoice", (req, res) => {
         .text(`$${taxAmount.toFixed(2)}`, 405, positionY + 20, { align: "right" });
 
     pdfDoc
-        .rect(375, positionY+40, 190, 20).fillAndStroke("#cccccc", "#000000")
+        .rect(375, positionY + 40, 190, 20).fillAndStroke("#cccccc", "#000000")
         .fillColor("#000000")
         .fontSize(12)
         .text(`Total Due: `, 305, positionY + 45, { align: "center"})
-        .text(`$${totalPrice.toFixed(2)}`, 405, positionY + 45, {align: "right"})
+        .text(`$${totalPrice.toFixed(2)}`, 405, positionY + 45, { align: "right"})
 
     // Add a signature line
     pdfDoc
@@ -136,4 +148,5 @@ app.post("/api/invoice", (req, res) => {
 app.listen(5000, () => {
     console.log("Server is running on port 5000");
 });
-module.exports = app
+
+module.exports = app;
