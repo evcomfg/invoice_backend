@@ -14,7 +14,7 @@ const app = express();
 app.use(cors(corsOptions)); // Enable CORS
 app.use(bodyParser.json());
 
-const TAX_RATE = 7.25; // 7.25%
+const TAX_RATE = 7.250; // 7.25%
 
 // POST endpoint to generate the invoice
 app.post("/api/invoice", (req, res) => {
