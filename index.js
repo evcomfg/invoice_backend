@@ -72,11 +72,19 @@ app.post("/api/invoice", (req, res) => {
     const addressLabel = shippingAddressSame === "yes" ? "BILL AND SHIP TO:" : "BILL TO:";
 
     pdfDoc
-        .text(addressLabel, 50, 180)
-        .text(`${customerName}`, 50, 195)
-        .text(`${billingAddress1}`, 50, 210)
-        .text(`${billingAddress2 || ""}`, 50, 225)
-        .text(`${billingCity}, ${billingState} ${billingZipCode}`, 50, 240);
+        .fontSize(12)
+        .text(addressLabel, 50, 180);
+
+    // Leave space before adding the address
+    const addressStartY = 200; // Adjust this value for desired spacing
+
+    // Add billing address
+    pdfDoc
+        .fontSize(10)
+        .text(`${customerName}`, 50, addressStartY)
+        .text(`${billingAddress1}`, 50, addressStartY + 15)
+        .text(`${billingAddress2 || ""}`, 50, addressStartY + 30)
+        .text(`${billingCity}, ${billingState} ${billingZipCode}`, 50, addressStartY + 45);
 
     if (shippingAddressSame === "no") {
         // Vertical line separator
@@ -87,11 +95,20 @@ app.post("/api/invoice", (req, res) => {
 
         // Add shipping information
         pdfDoc
+            .fontSize(12)
             .text("SHIP TO:", 250, 180)
-            .text(`${shippingCustomerName}`, 250, 195)
-            .text(`${shippingAddress1}`, 250, 210)
-            .text(`${shippingAddress2 || ""}`, 250, 225)
-            .text(`${shippingCity}, ${shippingState} ${shippingZipCode}`, 250, 240);
+            .moveTo(250, 195)
+            .lineTo(550, 195)
+
+        // Leave space before adding the shipping address
+        const shippingAddressStartY = 200; // Adjust this value for desired spacing
+
+        pdfDoc
+            .fontSize(10)
+            .text(`${shippingCustomerName}`, 250, shippingAddressStartY)
+            .text(`${shippingAddress1}`, 250, shippingAddressStartY + 15)
+            .text(`${shippingAddress2 || ""}`, 250, shippingAddressStartY + 30)
+            .text(`${shippingCity}, ${shippingState} ${shippingZipCode}`, 250, shippingAddressStartY + 45);
     }
 
     // Add table headers
