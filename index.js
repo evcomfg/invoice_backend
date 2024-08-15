@@ -57,7 +57,7 @@ app.post("/api/invoice", (req, res) => {
         .text("EVCO Manufacturing", 400, 60, { align: "right" })
         .text("405 N Grandview St", 400, 75, { align: "right" })
         .text("Union City, OH, 45390", 400, 90, { align: "right" })
-        .text("Phone: +1 (937)-741-3332", 400, 105, { align: "right" })
+        .text("Phone: +1 (937) - 741 - 3332", 400, 105, { align: "right" })
         .moveDown();
 
     // Add invoice details
