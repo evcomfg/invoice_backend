@@ -19,13 +19,13 @@ const TAX_RATE = 7.25; // 7.25%
 // POST endpoint to generate the invoice
 app.post("/api/invoice", (req, res) => {
     const {
-        customerName, address1, address2, city, state, zipCode, 
+        customerName, billingAddress1, billingAddress2, billingCity, billingState, billingZipCode, 
         shippingAddressSame, shippingCustomerName, shippingAddress1, shippingAddress2, shippingCity, shippingState, shippingZipCode,
         cartModel, basePrice, battery, battery_price, paint, paintColor, paintPrice, addOns
     } = req.body;
 
-    if (!customerName || !address1 || !city || !state || !zipCode || !cartModel || !basePrice) {
-        console.error("Missing required fields:", { customerName, address1, city, state, zipCode, cartModel, basePrice });
+    if (!customerName || !billingAddress1 || !billingCity || !billingState || !billingZipCode || !cartModel || !basePrice) {
+        console.error("Missing required fields:", { customerName, billingAddress1, billingCity, billingState, billingZipCode, cartModel, basePrice });
         return res.status(400).send("Missing required fields.");
     }
 
@@ -72,9 +72,9 @@ app.post("/api/invoice", (req, res) => {
     pdfDoc
         .text("BILL TO:", 50, 180)
         .text(`${customerName}`, 50, 195)
-        .text(`${address1}`, 50, 210)
-        .text(`${address2 || ""}`, 50, 225)
-        .text(`${city}, ${state} ${zipCode}`, 50, 240);
+        .text(`${billingAddress1}`, 50, 210)
+        .text(`${billingAddress2 || ""}`, 50, 225)
+        .text(`${billingCity}, ${billingState} ${billingZipCode}`, 50, 240);
 
     if (shippingAddressSame === "no") {
         // Vertical line separator
