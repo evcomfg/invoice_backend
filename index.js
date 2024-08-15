@@ -25,7 +25,7 @@ app.post("/api/invoice", (req, res) => {
     } = req.body;
 
     if (!customerName || !address1 || !city || !state || !zipCode || !cartModel || !basePrice) {
-        console.error("Missing required fields.");
+        console.error("Missing required fields:", { customerName, address1, city, state, zipCode, cartModel, basePrice });
         return res.status(400).send("Missing required fields.");
     }
 
