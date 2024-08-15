@@ -97,8 +97,6 @@ app.post("/api/invoice", (req, res) => {
         pdfDoc
             .fontSize(12)
             .text("SHIP TO:", 250, 180)
-            .moveTo(250, 195)
-            .lineTo(550, 195)
 
         // Leave space before adding the shipping address
         const shippingAddressStartY = 200; // Adjust this value for desired spacing
