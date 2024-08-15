@@ -69,8 +69,10 @@ app.post("/api/invoice", (req, res) => {
         .moveDown();
 
     // Add billing information
+    const addressLabel = shippingAddressSame === "yes" ? "BILL AND SHIP TO:" : "BILL TO:";
+
     pdfDoc
-        .text("BILL TO:", 50, 180)
+        .text(addressLabel, 50, 180)
         .text(`${customerName}`, 50, 195)
         .text(`${billingAddress1}`, 50, 210)
         .text(`${billingAddress2 || ""}`, 50, 225)
@@ -79,17 +81,17 @@ app.post("/api/invoice", (req, res) => {
     if (shippingAddressSame === "no") {
         // Vertical line separator
         pdfDoc
-            .moveTo(275, 180) // Starting point
-            .lineTo(275, 260) // Ending point
+            .moveTo(200, 180) // Starting point
+            .lineTo(200, 260) // Ending point
             .stroke();
 
         // Add shipping information
         pdfDoc
-            .text("SHIP TO:", 300, 180)
-            .text(`${shippingCustomerName}`, 300, 195)
-            .text(`${shippingAddress1}`, 300, 210)
-            .text(`${shippingAddress2 || ""}`, 300, 225)
-            .text(`${shippingCity}, ${shippingState} ${shippingZipCode}`, 300, 240);
+            .text("SHIP TO:", 250, 180)
+            .text(`${shippingCustomerName}`, 250, 195)
+            .text(`${shippingAddress1}`, 250, 210)
+            .text(`${shippingAddress2 || ""}`, 250, 225)
+            .text(`${shippingCity}, ${shippingState} ${shippingZipCode}`, 250, 240);
     }
 
     // Add table headers
