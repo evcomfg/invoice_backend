@@ -19,7 +19,7 @@ const TAX_RATE = 7.25; // 7.25%
 // POST endpoint to generate the invoice
 app.post("/api/invoice", (req, res) => {
     const {
-        customerName, address1, unit, city, state, zipCode, cartModel, basePrice,
+        customerName, address1, address2, city, state, zipCode, cartModel, basePrice,
         battery, battery_price, paint, paintColor, paintPrice, addOns
     } = req.body;
 
@@ -72,7 +72,7 @@ app.post("/api/invoice", (req, res) => {
         .text("BILL TO:", 50, 180)
         .text(`${customerName}`, 50, 195)
         .text(`${address1}`, 50, 210)
-        .text(`${unit || ""}`, 50, 225)
+        .text(`${address2 || ""}`, 50, 225)
         .text(`${city}, ${state} ${zipCode}`, 50, 240)
         .moveDown();
 
